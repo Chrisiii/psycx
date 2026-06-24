@@ -1,24 +1,36 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap");
 
 :root {
-  --pink: #fe019a;
-  --cyan: #00f5ff;
-  --green: #00ff88;
-  --yellow: #ffe600;
-  --orange: #ff8800;
-  --purple: #a000ff;
+  /* surfaces */
+  --bg: #0a0a0d; /* page background */
+  --nav: #0e0e12; /* navbar / footer background */
+  --card: #15151a; /* zone card background */
+  --card2: #17151c; /* AI bar background */
 
-  --bg: #1b1619;
-  --card: #c5eaea;
-  --card2: #0d0d25;
-  --nav: rgba(5, 5, 15, 0.98);
+  /* borders */
+  --border: #26262e;
+  --border-soft: rgba(255, 255, 255, 0.06);
 
-  --text: #e0e8f0;
-  --muted: #446688;
-  --dim: #2a3a4a;
+  /* brand accents — replaces old pink/cyan/green/yellow/orange/purple */
+  --lilac: #b98eff;
+  --lilac-glow: rgba(185, 142, 255, 0.5);
+  --pink: #ff7ac1;
+  --pink-glow: rgba(255, 122, 193, 0.5);
 
-  --fd: "Orbitron", monospace;
+  /* semantic, kept separate from brand accents */
+  --online: #00e08a;
+
+  /* text */
+  --text: #f2f2f5;
+  --muted: #8b8a94;
+  --dim: #6e6d78;
+
+  /* fonts */
+  --fd: "Orbitron", monospace; /* kept for logo/brand-mark use only */
   --fm: "Share Tech Mono", monospace;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
 }
 
 *,

@@ -1,0 +1,35 @@
+/*
+  Neon-pastel theme variables.
+  Drop these into your existing :root / GlobalStyle block,
+  replacing the old --cyan / --green / --yellow / --orange / --purple set.
+*/
+
+:root {
+  /* surfaces */
+  --bg: #0a0a0d; /* page background */
+  --nav: #0e0e12; /* navbar / footer background */
+  --card: #15151a; /* zone card background */
+  --card2: #17151c; /* AI bar background */
+
+  /* borders */
+  --border: #26262e;
+  --border-soft: rgba(255, 255, 255, 0.06);
+
+  /* brand accents — used everywhere instead of cyan/green/yellow/orange/purple */
+  --lilac: #b98eff;
+  --lilac-glow: rgba(185, 142, 255, 0.5);
+  --pink: #ff7ac1;
+  --pink-glow: rgba(255, 122, 193, 0.5);
+
+  /* semantic (kept separate from brand accents on purpose) */
+  --online: #00e08a;
+
+  /* text */
+  --text: #f2f2f5;
+  --muted: #8b8a94;
+  --dim: #6e6d78;
+
+  /* fonts — keep your existing font stacks */
+  --fd: "Space Grotesk", sans-serif;
+  --fm: "JetBrains Mono", monospace;
+}
