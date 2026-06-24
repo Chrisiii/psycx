@@ -1,0 +1,1 @@
+console.log("PLAIN JS WORKS");

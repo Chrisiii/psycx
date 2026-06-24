@@ -1,162 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
 import Footer from "../../components/Footer";
 import Navbar from "../../components/Navbar";
-
-const PRODUCTS = [
-  {
-    id: 1,
-    emoji: "👕",
-    category: "HOODIE",
-    name: "NEON DRIFT OVERSIZED",
-    price: 89,
-    oldPrice: 120,
-    badge: "HOT",
-    color: "#fe019a",
-    borderColor: "rgba(254,1,154,0.25)",
-    hoverBorder: "rgba(254,1,154,0.55)",
-    hoverShadow: "rgba(254,1,154,0.1)",
-    bg: "linear-gradient(135deg,#fce8f3,#f5d0ea)",
-    sizes: ["S", "M", "XL"],
-    soldOut: ["L"],
-    rating: 5,
-    reviews: 42,
-    liked: true,
-  },
-  {
-    id: 2,
-    emoji: "🧥",
-    category: "JACKET",
-    name: "CYBER RAIN JACKET",
-    price: 145,
-    oldPrice: null,
-    badge: "NEW",
-    color: "#0088aa",
-    borderColor: "rgba(0,136,170,0.25)",
-    hoverBorder: "rgba(0,136,170,0.55)",
-    hoverShadow: "rgba(0,136,170,0.1)",
-    bg: "linear-gradient(135deg,#e0f4ff,#c8eaff)",
-    sizes: ["S", "M", "L"],
-    soldOut: [],
-    rating: 4,
-    reviews: 18,
-    liked: false,
-  },
-  {
-    id: 3,
-    emoji: "👚",
-    category: "TEE",
-    name: "GLITCH LOGO TEE",
-    price: 35,
-    oldPrice: 55,
-    badge: "SALE",
-    color: "#b47800",
-    borderColor: "rgba(180,120,0,0.25)",
-    hoverBorder: "rgba(180,120,0,0.55)",
-    hoverShadow: "rgba(180,120,0,0.1)",
-    bg: "linear-gradient(135deg,#fffbe0,#fff5c0)",
-    sizes: ["XS", "S", "M", "L"],
-    soldOut: [],
-    rating: 5,
-    reviews: 67,
-    liked: false,
-  },
-  {
-    id: 4,
-    emoji: "🩳",
-    category: "BOTTOMS",
-    name: "PSYCX CARGO PANTS",
-    price: 95,
-    oldPrice: null,
-    badge: "HOT",
-    color: "#7700bb",
-    borderColor: "rgba(119,0,187,0.25)",
-    hoverBorder: "rgba(119,0,187,0.55)",
-    hoverShadow: "rgba(119,0,187,0.1)",
-    bg: "linear-gradient(135deg,#f0e8ff,#e4d0ff)",
-    sizes: ["S", "L", "XL"],
-    soldOut: ["M"],
-    rating: 4,
-    reviews: 31,
-    liked: false,
-  },
-  {
-    id: 5,
-    emoji: "🧢",
-    category: "ACCESSORIES",
-    name: "MATRIX SNAPBACK",
-    price: 45,
-    oldPrice: null,
-    badge: "NEW",
-    color: "#007744",
-    borderColor: "rgba(0,119,68,0.25)",
-    hoverBorder: "rgba(0,119,68,0.55)",
-    hoverShadow: "rgba(0,119,68,0.1)",
-    bg: "linear-gradient(135deg,#e0fff4,#c8ffe8)",
-    sizes: ["ONE SIZE"],
-    soldOut: [],
-    rating: 5,
-    reviews: 89,
-    liked: true,
-  },
-  {
-    id: 6,
-    emoji: "👟",
-    category: "FOOTWEAR",
-    name: "HYPERWAVE RUNNERS",
-    price: 165,
-    oldPrice: null,
-    badge: null,
-    color: "#bb5000",
-    borderColor: "rgba(187,80,0,0.25)",
-    hoverBorder: "rgba(187,80,0,0.55)",
-    hoverShadow: "rgba(187,80,0,0.1)",
-    bg: "linear-gradient(135deg,#fff2e0,#ffe4c0)",
-    sizes: ["40", "41", "43"],
-    soldOut: ["42"],
-    rating: 4,
-    reviews: 24,
-    liked: false,
-  },
-  {
-    id: 7,
-    emoji: "🧣",
-    category: "ACCESSORIES",
-    name: "VOID SCARF SET",
-    price: 55,
-    oldPrice: null,
-    badge: "HOT",
-    color: "#fe019a",
-    borderColor: "rgba(254,1,154,0.25)",
-    hoverBorder: "rgba(254,1,154,0.55)",
-    hoverShadow: "rgba(254,1,154,0.1)",
-    bg: "linear-gradient(135deg,#fce8f3,#f5d0ea)",
-    sizes: ["ONE SIZE"],
-    soldOut: [],
-    rating: 5,
-    reviews: 55,
-    liked: false,
-  },
-  {
-    id: 8,
-    emoji: "🥿",
-    category: "FOOTWEAR",
-    name: "DRIFT LOW SNEAKERS",
-    price: 125,
-    oldPrice: 150,
-    badge: "NEW",
-    color: "#0088aa",
-    borderColor: "rgba(0,136,170,0.25)",
-    hoverBorder: "rgba(0,136,170,0.55)",
-    hoverShadow: "rgba(0,136,170,0.1)",
-    bg: "linear-gradient(135deg,#e8f0ff,#d0e4ff)",
-    sizes: ["38", "39", "40"],
-    soldOut: ["41"],
-    rating: 4,
-    reviews: 37,
-    liked: false,
-  },
-];
+import type { RootState, AppDispatch } from "../../app/store"; // adjust path
+import { fetchProducts } from "../../features/products/productsSlice";
 
 const FILTERS = ["ALL", "HOODIES", "TEES", "JACKETS", "ACCESSORIES", "SALE"];
 
@@ -491,10 +339,45 @@ const PInfo = styled.div`
   letter-spacing: 1px;
 `;
 
+const StateMessage = styled.div`
+  padding: 40px 16px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 1px;
+`;
+
+interface Product {
+  id: number;
+  emoji: string;
+  category: string;
+  name: string;
+  price: number;
+  oldPrice: number | null;
+  badge: string | null;
+  color: string;
+  borderColor: string;
+  hoverBorder: string;
+  hoverShadow: string;
+  bg: string;
+  sizes: string[];
+  soldOut: string[];
+  rating: number;
+  reviews: number;
+  liked: boolean;
+}
+
 export default function Shop() {
+  const dispatch = useDispatch<AppDispatch>();
+  const { items, loading } = useSelector((state: RootState) => state.products);
+
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [search, setSearch] = useState("");
-  const [likedItems, setLikedItems] = useState<number[]>([1, 5]);
+  const [likedItems, setLikedItems] = useState<number[]>([]);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   const toggleLike = (id: number) => {
     setLikedItems((prev) =>
@@ -502,12 +385,15 @@ export default function Shop() {
     );
   };
 
-  const filtered = PRODUCTS.filter((p) => {
-    if (search && !p.name.toLowerCase().includes(search.toLowerCase()))
+  const products: Product[] = items ?? [];
+
+  console.log("DEV | products", products);
+  const filtered = products.filter((p) => {
+    if (search && !p.name?.toLowerCase().includes(search.toLowerCase()))
       return false;
     if (activeFilter === "ALL") return true;
     if (activeFilter === "SALE") return p.oldPrice !== null;
-    return p.category.includes(activeFilter.slice(0, -1));
+    return p.category?.includes(activeFilter.slice(0, -1));
   });
 
   return (
@@ -564,53 +450,61 @@ export default function Shop() {
           <AFChip>IN STOCK ✕</AFChip>
         </ActiveFilters>
 
-        <Grid>
-          {filtered.map((p) => (
-            <Card
-              key={p.id}
-              $border={p.borderColor}
-              $hover={p.hoverBorder}
-              $shadow={p.hoverShadow}
-            >
-              <PImg $bg={p.bg}>
-                <Emoji>{p.emoji}</Emoji>
-                {p.badge && <Badge $type={p.badge}>{p.badge}</Badge>}
-                <Wish
-                  $liked={likedItems.includes(p.id)}
-                  onClick={() => toggleLike(p.id)}
-                >
-                  {likedItems.includes(p.id) ? "♥" : "♡"}
-                </Wish>
-                <Sizes>
-                  {p.sizes.map((s) => (
-                    <Size key={s} $avail>
-                      {s}
-                    </Size>
-                  ))}
-                  {p.soldOut.map((s) => (
-                    <Size key={s}>{s}</Size>
-                  ))}
-                </Sizes>
-              </PImg>
-              <Info>
-                <Category>{p.category}</Category>
-                <PName>{p.name}</PName>
-                <Pricing>
-                  <div>
-                    <Price $color={p.color}>${p.price}</Price>
-                    {p.oldPrice && <OldPrice>${p.oldPrice}</OldPrice>}
-                  </div>
-                  <Rating>
-                    {"★".repeat(p.rating)}
-                    {"☆".repeat(5 - p.rating)}
-                    <span>({p.reviews})</span>
-                  </Rating>
-                </Pricing>
-                <AddBtn $color={p.color}>+ ADD TO CART</AddBtn>
-              </Info>
-            </Card>
-          ))}
-        </Grid>
+        {loading && <StateMessage>LOADING DROPS...</StateMessage>}
+
+        {!loading && filtered.length === 0 && (
+          <StateMessage>NO PRODUCTS FOUND</StateMessage>
+        )}
+
+        {!loading && filtered.length > 0 && (
+          <Grid>
+            {filtered.map((p) => (
+              <Card
+                key={p.id}
+                $border={p.borderColor}
+                $hover={p.hoverBorder}
+                $shadow={p.hoverShadow}
+              >
+                <PImg $bg={p.bg}>
+                  <Emoji>{p.emoji}</Emoji>
+                  {p.badge && <Badge $type={p.badge}>{p.badge}</Badge>}
+                  <Wish
+                    $liked={likedItems.includes(p.id)}
+                    onClick={() => toggleLike(p.id)}
+                  >
+                    {likedItems.includes(p.id) ? "♥" : "♡"}
+                  </Wish>
+                  <Sizes>
+                    {p.sizes?.map((s) => (
+                      <Size key={s} $avail>
+                        {s}
+                      </Size>
+                    ))}
+                    {p.soldOut?.map((s) => (
+                      <Size key={s}>{s}</Size>
+                    ))}
+                  </Sizes>
+                </PImg>
+                <Info>
+                  <Category>{p.category}</Category>
+                  <PName>{p.name}</PName>
+                  <Pricing>
+                    <div>
+                      <Price $color={p.color}>${p.price}</Price>
+                      {p.oldPrice && <OldPrice>${p.oldPrice}</OldPrice>}
+                    </div>
+                    <Rating>
+                      {"★".repeat(p.rating)}
+                      {"☆".repeat(5 - p.rating)}
+                      <span>({p.reviews})</span>
+                    </Rating>
+                  </Pricing>
+                  <AddBtn $color={p.color}>+ ADD TO CART</AddBtn>
+                </Info>
+              </Card>
+            ))}
+          </Grid>
+        )}
 
         <Pagination>
           <PPage>‹</PPage>
@@ -620,7 +514,7 @@ export default function Shop() {
           <PPage>...</PPage>
           <PPage>12</PPage>
           <PPage>›</PPage>
-          <PInfo>247 ITEMS</PInfo>
+          <PInfo>{filtered.length} ITEMS</PInfo>
         </Pagination>
       </Main>
       <Footer />
