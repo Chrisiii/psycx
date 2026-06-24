@@ -1,9 +1,11 @@
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 const SECTIONS = [
   {
     icon: "🛍",
     title: "SHOP",
+    path: "/shop",
     color: "var(--cyan)",
     border: "rgba(0,245,255,0.35)",
     glow: "rgba(0,245,255,0.05)",
@@ -19,6 +21,7 @@ const SECTIONS = [
   {
     icon: "🎮",
     title: "GAMES",
+    path: "/games",
     color: "var(--pink)",
     border: "rgba(254,1,154,0.35)",
     glow: "rgba(254,1,154,0.05)",
@@ -34,6 +37,7 @@ const SECTIONS = [
   {
     icon: "👥",
     title: "SOCIAL",
+    path: "/social",
     color: "var(--green)",
     border: "rgba(0,255,136,0.35)",
     glow: "rgba(0,255,136,0.05)",
@@ -49,6 +53,7 @@ const SECTIONS = [
   {
     icon: "✅",
     title: "TASKS",
+    path: "/tasks",
     color: "var(--yellow)",
     border: "rgba(255,230,0,0.35)",
     glow: "rgba(255,230,0,0.05)",
@@ -64,6 +69,7 @@ const SECTIONS = [
   {
     icon: "📸",
     title: "SHOOT PLANNER",
+    path: "/shoot-planner",
     color: "var(--orange)",
     border: "rgba(255,136,0,0.35)",
     glow: "rgba(255,136,0,0.05)",
@@ -78,6 +84,7 @@ const SECTIONS = [
   {
     icon: "🔐",
     title: "ADMIN",
+    path: "/admin",
     color: "var(--purple)",
     border: "rgba(160,0,255,0.35)",
     glow: "rgba(160,0,255,0.05)",
@@ -206,13 +213,20 @@ const Enter = styled.div`
 `;
 
 export default function Sections() {
+  const navigate = useNavigate(); // ← add this
+
   return (
     <Wrap>
       <Label>// PLATFORM SECTIONS</Label>
       <Title>Choose your zone</Title>
       <Grid>
         {SECTIONS.map((s) => (
-          <Card key={s.title} $border={s.border} $glow={s.glow}>
+          <Card
+            key={s.title}
+            $border={s.border}
+            $glow={s.glow}
+            onClick={() => navigate(s.path)} // ← add this
+          >
             <Icon>{s.icon}</Icon>
             <CardTitle>{s.title}</CardTitle>
             <CardDesc>{s.desc}</CardDesc>
