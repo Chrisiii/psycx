@@ -1,16 +1,32 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const fetchProducts = createAsyncThunk("products/fetch", async () => {
-  const res = await axios.get("http://localhost:3001/api/products");
-  return res.data;
-});
-
 interface ProductsState {
   items: any[];
   loading: boolean;
   error: string | null;
 }
+
+interface ProductFilters {
+  search: string;
+  category: string;
+  sale: boolean;
+}
+
+export const fetchProducts = createAsyncThunk(
+  "products/fetch",
+  async (filters: ProductFilters) => {
+    const params = new URLSearchParams();
+    if (filters.search) params.set("search", filters.search);
+    if (filters.category && filters.category !== "All") {
+      params.set("category", filters.category);
+    }
+    if (filters.sale) params.set("sale", "true");
+
+    const res = await axios.get(`http://localhost:3001/api/products?${params}`);
+    return res.data.items;
+  },
+);
 
 const initialState: ProductsState = {
   items: [],

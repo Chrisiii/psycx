@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import type { RootState, AppDispatch } from "../../app/store"; // adjust path
-
 import {
   Page,
   Main,
@@ -72,8 +71,18 @@ export default function Shop() {
   const [likedItems, setLikedItems] = useState<number[]>([]);
 
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    const timeout = setTimeout(() => {
+      dispatch(
+        fetchProducts({
+          search,
+          category: activeFilter,
+          sale: activeFilter === "Sale",
+        }),
+      );
+    }, 400);
+
+    return () => clearTimeout(timeout);
+  }, [search, activeFilter, dispatch]);
 
   const toggleLike = (id: number) => {
     setLikedItems((prev) =>
@@ -82,14 +91,6 @@ export default function Shop() {
   };
 
   const products: Product[] = items ?? [];
-
-  const filtered = products.filter((p) => {
-    if (search && !p.name?.toLowerCase().includes(search.toLowerCase()))
-      return false;
-    if (activeFilter === "All") return true;
-    if (activeFilter === "Sale") return p.oldPrice !== null;
-    return p.category?.includes(activeFilter.slice(0, -1));
-  });
 
   return (
     <Page>
@@ -105,7 +106,7 @@ export default function Shop() {
             <H1>Shop the drop</H1>
           </TitleWrap>
           <Meta>
-            <MetaCount>{filtered.length}</MetaCount>
+            <MetaCount>{products.length}</MetaCount>
             items available
           </Meta>
         </ShopHeader>
@@ -146,13 +147,13 @@ export default function Shop() {
 
         {loading && <StateMessage>Loading drops...</StateMessage>}
 
-        {!loading && filtered.length === 0 && (
+        {!loading && products.length === 0 && (
           <StateMessage>No products found</StateMessage>
         )}
 
-        {!loading && filtered.length > 0 && (
+        {!loading && products.length > 0 && (
           <Grid>
-            {filtered.map((p) => (
+            {products.map((p) => (
               <Card key={p.id}>
                 <PImg>
                   <Emoji>{p.emoji}</Emoji>
@@ -208,7 +209,7 @@ export default function Shop() {
           <PPage>...</PPage>
           <PPage>12</PPage>
           <PPage>›</PPage>
-          <PInfo>{filtered.length} items</PInfo>
+          <PInfo>{products.length} items</PInfo>
         </Pagination>
       </Main>
       <Footer />
