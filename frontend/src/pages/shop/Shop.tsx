@@ -64,11 +64,18 @@ interface Product {
 
 export default function Shop() {
   const dispatch = useDispatch<AppDispatch>();
-  const { items, loading } = useSelector((state: RootState) => state.products);
+  const { items, loading, pagination } = useSelector(
+    (state: RootState) => state.products,
+  );
 
   const [activeFilter, setActiveFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [likedItems, setLikedItems] = useState<number[]>([]);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, activeFilter]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -77,12 +84,32 @@ export default function Shop() {
           search,
           category: activeFilter,
           sale: activeFilter === "Sale",
+          page,
         }),
       );
     }, 400);
 
     return () => clearTimeout(timeout);
-  }, [search, activeFilter, dispatch]);
+  }, [search, activeFilter, page, dispatch]);
+
+  function getPageNumbers(current: number, total: number): (number | "...")[] {
+    const pages: (number | "...")[] = [];
+    const range = 1;
+
+    for (let i = 1; i <= total; i++) {
+      if (
+        i === 1 ||
+        i === total ||
+        (i >= current - range && i <= current + range)
+      ) {
+        pages.push(i);
+      } else if (pages[pages.length - 1] !== "...") {
+        pages.push("...");
+      }
+    }
+
+    return pages;
+  }
 
   const toggleLike = (id: number) => {
     setLikedItems((prev) =>
@@ -202,14 +229,45 @@ export default function Shop() {
         )}
 
         <Pagination>
-          <PPage>‹</PPage>
-          <PPage $active>1</PPage>
-          <PPage>2</PPage>
-          <PPage>3</PPage>
-          <PPage>...</PPage>
-          <PPage>12</PPage>
-          <PPage>›</PPage>
-          <PInfo>{products.length} items</PInfo>
+          <PPage
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            style={
+              page === 1 ? { pointerEvents: "none", opacity: 0.4 } : undefined
+            }
+          >
+            ‹
+          </PPage>
+
+          {getPageNumbers(pagination.page, pagination.totalPages).map((p, i) =>
+            p === "..." ? (
+              <PPage key={`ellipsis-${i}`} style={{ pointerEvents: "none" }}>
+                ...
+              </PPage>
+            ) : (
+              <PPage
+                key={p}
+                $active={p === pagination.page}
+                onClick={() => setPage(p)}
+              >
+                {p}
+              </PPage>
+            ),
+          )}
+
+          <PPage
+            onClick={() =>
+              setPage((p) => Math.min(pagination.totalPages, p + 1))
+            }
+            style={
+              page === pagination.totalPages
+                ? { pointerEvents: "none", opacity: 0.4 }
+                : undefined
+            }
+          >
+            ›
+          </PPage>
+
+          <PInfo>{pagination.totalItems} items</PInfo>
         </Pagination>
       </Main>
       <Footer />
