@@ -5,12 +5,22 @@ interface ProductsState {
   items: any[];
   loading: boolean;
   error: string | null;
+  pagination: Pagination;
 }
 
 interface ProductFilters {
   search: string;
   category: string;
   sale: boolean;
+  page?: number;
+  limit?: number;
+}
+
+interface Pagination {
+  page: number;
+  limit: number;
+  totalItems: number;
+  totalPages: number;
 }
 
 export const fetchProducts = createAsyncThunk(
@@ -22,9 +32,11 @@ export const fetchProducts = createAsyncThunk(
       params.set("category", filters.category);
     }
     if (filters.sale) params.set("sale", "true");
+    params.set("page", String(filters.page ?? 1));
+    params.set("limit", String(filters.limit ?? 12));
 
     const res = await axios.get(`http://localhost:3001/api/products?${params}`);
-    return res.data.items;
+    return res.data as { items: any[]; pagination: Pagination };
   },
 );
 
@@ -32,6 +44,7 @@ const initialState: ProductsState = {
   items: [],
   loading: false,
   error: null,
+  pagination: { page: 1, limit: 12, totalItems: 0, totalPages: 0 },
 };
 
 const productsSlice = createSlice({
@@ -46,7 +59,8 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.items = action.payload.items;
+        state.pagination = action.payload.pagination;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
